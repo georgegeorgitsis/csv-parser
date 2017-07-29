@@ -14,7 +14,7 @@
 class Image_library {
 
     /**
-     * Filter data in row. In this case, we only trim. We can add more filters in a later phase
+     * Filter data in row. In this case, we only trim. We can add more filters in a later phase for security reasons and more.
      * 
      * @param type $row
      * @return type
@@ -41,35 +41,45 @@ class Image_library {
         if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) //check if the url is valid
             return FALSE;
 
-        return TRUE;
+        if (!$image_headers = $this->checkRemoteFile($url))
+            return FALSE;
+
+        return $image_headers;
     }
 
-    
     /**
-     * Check if the remote file exists and is image
+     * Check if the remote file exists and is an image
      * 
      * @param type $url
-     * @return boolean
+     * @return array or boolean
      */
     public function checkRemoteFile($url) {
-        $url = str_replace("https", "http", $url); //Without SSL it is forbidden to curl to image. Temporary replace https with http
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $image = curl_exec($ch);
 
-        curl_exec($ch);
+        /*
+         * Check content type of image from headers.
+         * We can use both pathinfo and content types to be sure about the image type
+         * because some servers send raw data for images or different content types.
+         * Also some images on web doesn't have the .type of them and we choose to download them.
+         * Here we check the from headers and return type and name through path info
+         */
         $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         $contentLength = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
         curl_close($ch);
-        
-        $type = split('/', $contentType);
-        if ($type[0] == "image")
-            return array('type'=>$type[1],'');
+
+        $type = explode('/', $contentType);
+        $filePath = $this->filePath($url);
+        if ($type[0] == "image") {
+            if ($local_name = $this->downloadImage($url, $filePath['basename'], $filePath['extension']))
+                return array('type' => $filePath['extension'], 'size' => $contentLength, 'name' => $filePath['basename'], 'local_name' => $local_name);
+        }
         return FALSE;
     }
 
@@ -105,7 +115,7 @@ class Image_library {
             return TRUE;
 
         foreach ($images as $image) {
-            if ($image['title'] == $row['title']) {
+            if ($image['title'] == $row[0]) {
                 return FALSE;
             }
         }
@@ -113,11 +123,38 @@ class Image_library {
     }
 
     /**
-     * Create a new UUID for each image
+     * 
+     * @param type $filePath
+     * @return type
+     */
+    public function filePath($filePath) {
+        $fileParts = pathinfo($filePath);
+
+        if (!isset($fileParts['filename'])) {
+            $fileParts['filename'] = substr($fileParts['basename'], 0, strrpos($fileParts['basename'], '.'));
+        }
+
+        return $fileParts;
+    }
+
+    /**
+     * Create a new UUID for each image. Remove the dot created by default when you pass prefix in uniqid.
      * @return type 
      */
     public function get_uuid() {
-        return uniqid(rand(), TRUE);
+        return str_replace('.', '', uniqid(rand(), TRUE));
+    }
+
+    public function downloadImage($url, $name, $type) {
+        $this->ci = & get_instance();
+        $download_dir = $this->ci->config->item('download_dir');
+        if ($download_dir != "" && $download_dir) {
+            $local_name = $this->get_uuid() . $name;
+            $fullpath = $download_dir . '/' . $local_name;
+            copy($url, $fullpath);
+            return $local_name;
+        }
+        return FALSE;
     }
 
 }

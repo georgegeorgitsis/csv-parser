@@ -22,7 +22,7 @@ class Image_model extends CI_Model {
      * @return result_array or boolean
      */
     public function getImages() {
-        $this->db->select('uuid')
+        $this->db->select('images.uuid,images.title,images.remote_url as url,images.description')
                 ->from('images')
                 ->where('is_deleted', 0)
                 ->order_by('created_date');
@@ -40,7 +40,7 @@ class Image_model extends CI_Model {
      * @return row_array or boolean
      */
     public function getImage($uuid = null, $title = null) {
-        $this->db->select('uuid')
+        $this->db->select('images.uuid,images.title,images.description,images.local_name,images.type')
                 ->from('images')
                 ->where('is_deleted', 0);
 
@@ -55,6 +55,12 @@ class Image_model extends CI_Model {
         if ($qry->num_rows() == 1)
             return $qry->row_array();
         return FALSE;
+    }
+
+    public function batchInsertImages($images) {
+        $this->db->trans_start();
+        $this->db->insert_batch('images', $images);
+        $this->db->trans_commit();
     }
 
 }

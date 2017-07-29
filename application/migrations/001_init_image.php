@@ -15,15 +15,24 @@ class Migration_init_image extends CI_Migration {
 
     public function up() {
         $this->dbforge->add_field(array(
-            'UUID' => array(
+            'id' => array(
                 'type' => 'BIGINT',
                 'unsigned' => TRUE,
+                'auto_increment' => TRUE
+            ),
+            'UUID' => array(
+                'type' => 'VARCHAR',
+                'constraint' => '32',
             ),
             'title' => array(
                 'type' => 'VARCHAR',
                 'constraint' => '255',
             ),
             'name' => array(
+                'type' => 'VARCHAR',
+                'constraint' => '255',
+            ),
+            'local_name' => array(
                 'type' => 'VARCHAR',
                 'constraint' => '255',
             ),
@@ -46,7 +55,8 @@ class Migration_init_image extends CI_Migration {
             )
         ));
         $this->dbforge->add_field('created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
-
+        
+        $this->dbforge->add_key('id', TRUE);
         $this->dbforge->add_key('UUID', TRUE);
         $this->dbforge->create_table('images');
 

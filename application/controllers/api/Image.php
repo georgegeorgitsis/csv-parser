@@ -40,8 +40,10 @@ class Image extends REST_Controller {
 
             $filtered_row = $this->image_library->filterData($row); //filter the data before any action.
 
-            if ($this->image_library->validateRow($filtered_row[0], $filtered_row[1])) { //Check if row is valid per title and url.
-                array_push($this->images_to_upload, $this->image_library->manipulateRow($this->images_to_upload, $filtered_row));
+            if ($image_headers = $this->image_library->validateRow($filtered_row[0], $filtered_row[1])) { //Check if row is valid per title and url. Check if image is valid and return headers.
+                $row_data = $this->image_library->manipulateRow($this->images_to_upload, $filtered_row);
+                $image_data = array_merge($row_data, $image_headers);
+                array_push($this->images_to_upload, $image_data);
             }
 
             $row_counter++;
@@ -49,11 +51,39 @@ class Image extends REST_Controller {
 
 
         var_dump($this->images_to_upload);
-        //$this->set_response($message, REST_Controller::HTTP_CREATED); // CREATED (201) being the HTTP response code
+
+        $this->Image_model->batchInsertImages($this->images_to_upload);
+//$this->set_response($message, REST_Controller::HTTP_CREATED); // CREATED (201) being the HTTP response code
     }
 
-    private function checkImageDB($title) {
-        return ($this->image_model->getImage(null, $title)) ? TRUE : FALSE;
+    public function getImages_get() {
+        $images = $this->Image_model->getImages();
+
+        if ($images && !empty($images)) {
+            $this->response($images, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => FALSE,
+                'error' => 'No images found'
+                    ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function getImage_get() {
+        $uuid = trim($this->get('uuid'));
+
+        $image = $this->Image_model->getImage($uuid, null);
+
+        if ($image && !empty($image)) {
+            $image['url'] = base_url('images/' . $image['local_name']);
+            unset($image['local_name']);
+            $this->response($image, REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => FALSE,
+                'error' => 'No image found'
+                    ], REST_Controller::HTTP_NOT_FOUND);
+        }
     }
 
 }
