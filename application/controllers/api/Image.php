@@ -15,7 +15,8 @@ class Image extends REST_Controller {
     function __construct() {
         // Construct the parent class
         parent::__construct();
-        $this->load->library('utils');
+        $this->load->helper('utils');
+        $this->load->library('Image_library');
 
         // Configure limits on our controller methods
         // Ensure you have created the 'limits' table and enabled 'limits' within application/config/rest.php
@@ -25,7 +26,9 @@ class Image extends REST_Controller {
     }
 
     /**
-     * images_post supports uploading csv files and inserting into database
+     * SEGMENTS OF URL AFTER base_url(): image/insert
+     * METHOD: POST
+     * GENERAL DESCRIPTION: Get the csv file through $_FILES and insert into database
      */
     public function insert_post() {
         $image = $_FILES['images'];
@@ -34,16 +37,10 @@ class Image extends REST_Controller {
         $row = 1;
         $images_temp = array();
         while ($row = fgetcsv($csv, 1000, '|')) {
-            if ($row == 1)
+            if ($row == 1) //It is a requirement that the first row of the csv must be ignored
                 continue;
 
-            /*
-             * Check if row is valid. A valid row must have an image URL and a title
-             */
-            $image_title = trim($row[0]);
-            $remote_url = trim($row[1]);
-
-
+            $valid_row = $this->image_library->validateRow(trim($row[0]), trim($row[1])); //Check if row is valid. A valid row must have an image URL and a title
 
             $row_image = array();
             $row_image['uuid'] = $this->utils->get_uuid();
