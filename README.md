@@ -8,7 +8,9 @@ George Georgitsis (georgegeorgitsis@gmail.com)
 ### Introduction
 This small API web service was written for the purposes of the the Interview Assignment that was given to me on 28/07/2017 by Berlinger.
 
-The application was built in PHP using `Codeigniter v.3.1.*` through `composer` from https://github.com/kenjis/codeigniter-composer-installer and `Restserver` through `composer` from https://github.com/chriskacerguis/codeigniter-restserver and `MySQL`
+The application was built in PHP using `Codeigniter v.3.1.*` through `composer` from https://github.com/kenjis/codeigniter-composer-installer , `Restserver` through `composer` from https://github.com/chriskacerguis/codeigniter-restserver and `MySQL`
+
+The API supports HTTP requests with methods POST and GET. 1 POST request to send a csv file with images and 2 GET requests to retrieve all or a single image based on its UUID.
 
 For assignment purposes, no `API KEY` is required, neither any other Authentication/Authorization service to use or install the application.
 
