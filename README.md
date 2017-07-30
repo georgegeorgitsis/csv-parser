@@ -36,25 +36,27 @@ The API allows 3 different operations:
 In order to upload big data and large csv files, the application was designed in a way that could handle them. 
 
 Instead of validating the existence and download each image in real-time-process (2 processes that need time to be executed), the application saves in db the records with a picture_title field and a valid URL by syntax. 
-Each POST request has a status=0 when insert that means `in_progress`, also each saved image has a status=0 when insert that means `in_progress` too. 
+Each POST request is saved in database and has a status=0 when insert that means `in_progress`. Also each saved image has a status=0 when insert that means `in_progress` too. 
 
-In the application(not API call) there is another functionality where, it retrieves the `in_progress` requests and for each image of the `in_progress` request, validates and downloads the image from the given URL if available. 
-If URL is a valid image and is downloaded locally, the application updates the image status to 2 that means `completed` and updates db. 
+In the application(not API call) there is another functionality where, it retrieves the `in_progress` requests, retrieves each `in_progress` image of the request and then validates and downloads the image from the given URL if available. 
+
+If URL is a valid image and is downloaded locally, the application updates the image status to 2 that means `completed` and updates db with new information.
 Otherwise the image has status 1 that means `failed`.
+
 When all images are parsed, the application updates the request to status 2, that means `completed`.
 
 In that way, the application can handle millions of records and the only limit is if the server can handle big csv files.
 
 A daemon/worker/queue/cron can be used to run the above `Download_images` functionality. Because i have only a simple shared web hosting account, i could not test any of them. 
-Instead of that, there is a URL that will perform the existence and download of each image in `DOMAIN/download_images`.
+Instead of that, there is a URL that will perform the existence and download of each image in `DOMAIN/download_images`. Check NOTES below for more information.
 
-Until the download_images functionality is run, the validated images can still be retrieved but with status `in_progress`. 
+Until the download_images functionality is completed, the uploaded images can still be retrieved but with status `in_progress`. 
 
 ---
 
 ## The workflow of GET ALL images request
-1. The user can GET all of his images to `DOMAIN/image/getImages`.
-2. The application retrieves all images in db and returns in `JSON` format.
+1. The user can GET all images to `DOMAIN/image/getImages`.
+2. The application retrieves all images from db and returns in `JSON` format.
 3. In order to retrieve images in `XML`, a parameter `?format=XML` is required.
 
 ### Quick Explanation of GET ALL images
@@ -63,7 +65,7 @@ For assignment purposes, there is no validation of the user. The `getImages` req
 ---
 
 ## The workflow of GET a single image request
-1. The user can GET one image using the parameter `UUID` in the request.
+1. The user can GET one image using the parameter `uuid` in the request.
 2. The application retrieves the image (if available by uuid) and searches the local directory to return the local image.
 3. There is a requirement that a local copy of the image is always available.
 4. In order to retrieve the image in `XML`, a parameter `?format=XML` is also required.
