@@ -129,12 +129,16 @@ The second validations are performed when `download_images` functionality runs a
 ```
 
 ---
-#### Notes
+#### How to Test 
 * The API is uploaded on my shared hosting account with limited recourses.
 * The API URL to test the POST functionality is http://georgitsis.eu/berlinger/public/api/image/insert . You can POST a csv file with key `images` from anywhere or visit http://georgitsis.eu/berlinger/public/test/postCSV to POST the sample `images_data.csv` of the assigment. 
 * After POSTing the csv file, you have to manually visit http://georgitsis.eu/berlinger/public/download_images/processRequests in order to validate and download the images. Otherwise all uploaded images will be `in_progress`.
 * The API URL to GET ALL images functionality is http://georgitsis.eu/berlinger/public/api/image/getImages 
-* The API URL to GET a single image funcionality is http://georgitsis.eu/berlinger/public/api/image/getImage?uuid=XXX , where the uuid parameter is dynamically used for already saved images.
+* The API URL to GET a single image functionality is http://georgitsis.eu/berlinger/public/api/image/getImage?uuid=XXX , where the uuid parameter is dynamically used for already saved images.
+
+---
+#### Notes
+* CSV files and images are saved with a prefix of UUID in order to avoid duplicates.
 
 ---
 #### Files to be reviewed 
@@ -142,7 +146,7 @@ As the API is built with `Codeigniter` + `Restserver`, both of them have just be
 
 The files that are written by me, in order to develop this API are the bellow:
 * application/controllers/api/Image.php
-* application/controllers/Download_images
+* application/controllers/Download_images.php
 * application/controllers/Migrate.php
 * application/libraries/Image_library.php
 * application/libraries/Image_library.php
