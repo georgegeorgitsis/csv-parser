@@ -147,6 +147,7 @@ class Image_library {
         if ($type[0] == "image") {
             if ($local_name = $this->copyImage($url, $filePath['basename'], $filePath['extension'])) //Check if image is downloaded
                 return array('type' => $filePath['extension'], 'size' => $contentLength, 'name' => $filePath['basename'], 'local_name' => $local_name); //return info of image
+            return FALSE;
         }
         return FALSE;
     }
