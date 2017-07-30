@@ -95,6 +95,40 @@ The second validations are performed when `download_images` functionality runs a
 3. Try to download the image locally
 
 ---
+#### Sample GET response of ALL images
+```php
+[
+    {
+        "uuid": "120575716597dee6bab5f5002026717",
+        "title": "Bumblebee",
+        "url": "https://c3.staticflickr.com/8/7350/10643721146_1a48c13161_c.jpg",
+        "description": "Nice insect",
+        "status": "completed"
+    },
+    {
+        "uuid": "646531920597dee6bab61d527522840",
+        "title": "Bumblebee 2",
+        "url": "https://c4.staticflickr.com/9/8754/17146884707_0795be28d4_h.jpg",
+        "description": "",
+        "status": "completed"
+    },
+]
+```
+
+#### Sample GET response of a single image
+```php
+[
+    {
+        "uuid": "120575716597dee6bab5f5002026717",
+        "title": "Bumblebee",
+        "url": "https://localhost/images/10643721146_1a48c13161_c.jpg",
+        "description": "Nice insect",
+        "status": "completed"
+    },
+]
+```
+
+---
 #### Notes
 * The API is uploaded on my shared hosting account with limited recourses.
 * The API URL to test the POST functionality is http://georgitsis.eu/berlinger/public/api/image/insert . You can POST a csv file with key `images` from anywhere or visit http://georgitsis.eu/berlinger/public/test/postCSV to POST the sample `images_data.csv` of the assigment. 
