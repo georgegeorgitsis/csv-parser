@@ -19,6 +19,8 @@ The API allows 3 different operations:
 * Allow the user to get all images
 * Allow the user to get a single image using the unique identifier
 
+---
+
 ## The workflow of POST Request
 1. The user POSTs a csv file with key `images` to `DOMAIN/image/insert`.
 2. The application receives and saves the posted csv file locally.
@@ -76,6 +78,20 @@ After POSTing the csv file, or after performing the GET ALL images request, a uu
 5. Run migration file to create the database schema. The migration URL is `YOUR_DOMAIN/migrate`
 
 ---
+#### Validation of images
+
+As you have read in the `Quick Explanation of POST`, the validation is split into 2 operations. 
+The first validations of rows are performed when reading the csv file and are:
+1. Trim data fields
+2. Check picture_title and picture_url are empty strings.
+3. Check with filter_var() if the URL is syntax correct.
+
+The second validations are performed when `download_images` functionality runs and are:
+1. Check if the URL responses.
+2. Check Content-Type and pathinfo() information of the image
+3. Try to download the image locally
+
+---
 #### Notes
 * The API is uploaded on my shared hosting account with limited recourses.
 * The API URL to test the POST functionality is http://georgitsis.eu/berlinger/public/api/image/insert . You can POST a csv file with key `images` from anywhere or visit http://georgitsis.eu/berlinger/public/test/postCSV to POST the sample `images_data.csv` of the assigment. 
@@ -84,9 +100,25 @@ After POSTing the csv file, or after performing the GET ALL images request, a uu
 * The API URL to GET a single image funcionality is http://georgitsis.eu/berlinger/public/api/image/getImage?uuid=XXX , where the uuid parameter is dynamically used for already saved images.
 
 ---
+#### Files to be reviewed 
+As the API is built with `Codeigniter` + `Restserver`, both of them have just been configured to run on the server.
+
+The files that are written by me, in order to develop this API are the bellow:
+* application/controllers/api/Image.php
+* application/controllers/Download_images
+* application/controllers/Migrate.php
+* application/libraries/Image_library.php
+* application/libraries/Image_library.php
+* application/migrations/001_init_image | application/migrations/002_size | application/migrations/003_api_calls
+
+---
 #### TODO
 There are a lot of things that would need refactoring for considering this app a full RESTful API and a well build application. I can see the following:
+
 * Create API KEYS for each user to use the API.
 * Run the `Download_images` process as a worker or as a separated thread at least, immediately after the POST request is completed, based on server load.
 * A field `is_deleted` is added in `images` table, in order to let the user delete his images in the future.
 * Validations and downloads of images can be performed faster and safer using raw information of the image.
+* For GET requests of the image(s), there are more fields/information to be returned. Those information can be used for other purposes or can be returned back to the user.
+* A PATCH method request to update the already saved images with new fields/information.
+* Constants in application to control variables that are used in controllers, models and libraries.
