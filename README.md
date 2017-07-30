@@ -76,10 +76,11 @@ For assignment purposes, there is no validation of the user. The `getImages` req
 ### Quick Explanation of GET one image
 After POSTing the csv file, or after performing the GET ALL images request, a uuid is returned for each image. The user must use the parameter `?uuid=THE_UUID_VALUE` to retrieve the selected image.
 
-### Installation / Configuring
+---
+### Installation / Configuration 
 1. Download or clone repository into your webserver. The domain should point to folder `public` where `index.php` will route into `Codeigniter`
 2. Create a database in your server
-3. Change `base_url`, `download_images_dir` and `download_csv_dir` in `applications/config/config.php`. `download_images_dir` is the directory where the images will be downloaded and must be located under `public` folder in order be web accessible. `download_csv_dir` is where the uploaded csv files will be downloaded and must be located in `root` folder.
+3. Change `base_url`, `download_images_dir` and `download_csv_dir` in `applications/config/config.php`. *`download_images_dir` is the directory where the images will be downloaded and must be located under `public` folder in order be web accessible. `download_csv_dir` is where the uploaded csv files will be downloaded and must be located in `root` folder.*
 4. Change `hostname`, `username`, `password` and `database` in `applications/config/database.php`
 5. Run migration file to create the database schema. The migration URL is `YOUR_DOMAIN/migrate`
 
