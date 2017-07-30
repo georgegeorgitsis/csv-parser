@@ -8,9 +8,9 @@ George Georgitsis (georgegeorgitsis@gmail.com)
 ### Introduction
 This small API web service was written for the purposes of the the Interview Assignment that was given to me on 28/07/2017 by Berlinger.
 
-The application was built in PHP using `Codeigniter v.3.1.*` through `composer` from https://github.com/kenjis/codeigniter-composer-installer , `Restserver` through `composer` from https://github.com/chriskacerguis/codeigniter-restserver and `MySQL`
+The application was built in PHP using `Codeigniter v.3.1` through `composer` from https://github.com/kenjis/codeigniter-composer-installer , `Restserver` through `composer` from https://github.com/chriskacerguis/codeigniter-restserver and `MySQL`
 
-The API supports HTTP requests with methods POST and GET. 1 POST request to send a csv file with images and 2 GET requests to retrieve all or a single image based on its UUID.
+The API supports HTTP requests with methods POST and GET. One POST request to send a csv file with images and two GET requests to retrieve all or a single image based on its UUID.
 
 For assignment purposes, no `API KEY` is required, neither any other Authentication/Authorization service to use or install the application.
 
@@ -24,12 +24,13 @@ The API allows 3 different operations:
 ## The workflow of POST Request
 1. The user POSTs a csv file with key `images` to `DOMAIN/image/insert`.
 2. The application receives and saves the posted csv file locally.
-3. A new request is saved into database with UUID and status `in_progress`
+3. A new request is saved into database (table `requests`) with UUID and status `in_progress`
 4. The application opens the saved csv file and loops through each row/image.
 5. Sanitizes and validates rows (fields + URL syntax).
 6. Checks if there are duplicates in picture title fields and replaces if so.
 7. Each valid row/image from csv file with status `in_progress`, is pushed into array in order to batch insert into db.
-8. Insert all `in_progress` images into db.
+8. Inserts all `in_progress` images into db.
+9. Returns all saved `in_progress` images from database.
 
 ### Quick Explanation of POST
 In order to upload big data and large csv files, the application was designed in a way that could handle them. 
@@ -122,3 +123,4 @@ There are a lot of things that would need refactoring for considering this app a
 * For GET requests of the image(s), there are more fields/information to be returned. Those information can be used for other purposes or can be returned back to the user.
 * A PATCH method request to update the already saved images with new fields/information.
 * Constants in application to control variables that are used in controllers, models and libraries.
+* A cache system for both images and sql queries.
