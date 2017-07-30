@@ -19,6 +19,9 @@ The API allows 3 different operations:
 * Allow the user to get all images
 * Allow the user to get a single image using the unique identifier
 
+
+*The API was tested using LAMP Stack on Ubuntu 16.10 and WAMP64 on Windows. Also Postman was used to simulate requests *
+
 ---
 
 ## The workflow of POST Request
