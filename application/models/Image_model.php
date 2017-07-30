@@ -47,7 +47,11 @@ class Image_model extends CI_Model {
      * @return row_array or boolean
      */
     public function getImage($uuid) {
-        $this->db->select('images.uuid,images.title,images.description,images.local_name,images.type')
+        $this->db->select("images.uuid,images.title,images.remote_url as url,images.description,images.local_name,"
+                        . "CASE status WHEN 0 THEN 'in_progress'
+                     WHEN 1 THEN 'failed'
+                     ELSE 'completed'
+    END as status")
                 ->from('images')
                 ->where('is_deleted', 0);
 

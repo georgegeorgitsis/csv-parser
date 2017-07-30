@@ -47,13 +47,13 @@ class Image extends REST_Controller {
 
             if (!$this->isDuplicatedTitle($row)) { //Check if title is duplicated
                 $row_data = $this->image_library->prepareRow($this->images_to_upload, $filtered_row); //Create array based on database to use Active Record.
-                $row_data['request_uuid'] = $request_id; //add in which request_id the images belongs.
+                $row_data['request_uuid'] = $request_id; //add in which request_id the images belong.
                 array_push($this->images_to_upload, $row_data); //push the image in this row in images_to_upload, for batch insert
             }
         }
 
         if ($this->Image_model->batchInsertImages($this->images_to_upload)) { //batch insert images. If success, return images. Otherwise HTTP CODE 500.
-            $images = $this->Image_model->getImages($request_id); //
+            $images = $this->Image_model->getImages($request_id); //Return the saved images
             $this->set_response($images, REST_Controller::HTTP_CREATED); // CREATED (201) being the HTTP response code
         } else {
             $this->set_response(array(), REST_Controller::HTTP_INTERNAL_SERVER_ERROR); //Unable to save images in db, HTTP CODE 500
@@ -168,14 +168,14 @@ class Image extends REST_Controller {
      * @return boolean
      */
     public function isDuplicatedTitle($row) {
-        if (empty($this->images_to_upload))
+        if (empty($this->images_to_upload)) //Nothing to compare
             return FALSE;
 
-        foreach ($this->images_to_upload as $image_key => $image) {
-            if ($image['title'] == $row[0]) {
+        foreach ($this->images_to_upload as $image_key => $image) { //For each of images to upload, check the exact title
+            if ($image['title'] == $row[0]) { //If title is duplicated, replace data with new
                 $this->images_to_upload[$image_key]['url'] = $row[1];
                 $this->images_to_upload[$image_key]['description'] = $row[2];
-                break;
+                return TRUE;
             }
         }
         return FALSE;
