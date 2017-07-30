@@ -47,6 +47,8 @@ Instead of that, there is a URL that will perform the existence and download of 
 
 Until the download_images functionality is run, the validated images can still be retrieved but with status `in_progress`. 
 
+---
+
 ## The workflow of GET ALL images request
 1. The user can GET all of his images to `DOMAIN/image/getImages`.
 2. The application retrieves all images in db and returns in `JSON` format.
@@ -55,10 +57,13 @@ Until the download_images functionality is run, the validated images can still b
 ### Quick Explanation of GET ALL images
 For assignment purposes, there is no validation of the user. The `getImages` request returns all the available images from db.
 
+---
+
 ## The workflow of GET a single image request
 1. The user can GET one image using the parameter `UUID` in the request.
 2. The application retrieves the image (if available by uuid) and searches the local directory to return the local image.
 3. There is a requirement that a local copy of the image is always available.
+4. In order to retrieve the image in `XML`, a parameter `?format=XML` is also required.
 
 ### Quick Explanation of GET one image
 After POSTing the csv file, or after performing the GET ALL images request, a uuid is returned for each image. The user must use the parameter `?uuid=THE_UUID_VALUE` to retrieve the selected image.
@@ -70,5 +75,18 @@ After POSTing the csv file, or after performing the GET ALL images request, a uu
 4. Change `hostname`, `username`, `password` and `database` in `applications/config/database.php`
 5. Run migration file to create the database schema. The migration URL is `YOUR_DOMAIN/migrate`
 
-## Using the app
-The user of the service can POST a csv file in key `images`. Any other key will be ignored. 
+---
+#### Notes
+* The API is uploaded on my shared hosting account with limited recourses.
+* The API URL to test the POST functionality is http://georgitsis.eu/berlinger/public/api/image/insert . You can POST a csv file with key `images` from anywhere or visit http://georgitsis.eu/berlinger/public/test/postCSV to POST the sample `images_data.csv` of the assigment. 
+* After POSTing the csv file, you have to manually visit http://localhost/berlinger/public/download_images/processRequests in order to validate and download the images. Otherwise all uploaded images will be `in_progress`.
+* The API URL to GET ALL images functionality is http://georgitsis.eu/berlinger/public/api/image/getImages 
+* The API URL to GET a single image funcionality is http://georgitsis.eu/berlinger/public/api/image/getImage?uuid=XXX , where the uuid parameter is dynamically used for already saved images.
+
+---
+#### TODO
+There are a lot of things that would need refactoring for considering this app a full RESTful API and a well build application. I can see the following:
+* Create API KEYS for each user to use the API.
+* Run the `Download_images` process as a worker or as a separated thread at least, immediately after the POST request is completed, based on server load.
+* A field `is_deleted` is added in `images` table, in order to let the user delete his images in the future.
+* Validations and downloads of images can be performed faster and safer using raw information of the image.
