@@ -50,16 +50,10 @@ class Image_library {
     /**
      * Prepare the array for db.
      * 
-     * As per requirement "If a consecutive load of the data contains already existing elements, the data will be overwritten with the newest version"
-     * check for this csv only and NOT IN DB for other images, if the title is duplicated in images to be uploaded.
-     * 
      * @param type $row
      * @return type
      */
     public function prepareRow($images, $row) {
-        if (!$this->checkDuplicateTitle($images, $row)) //check dublicate titles
-            return FALSE;
-
         //prepare the array for db to be inserted. $row[0],[1] etc. can be defined in constants.
         $array['uuid'] = $this->get_uuid(); //get the UUID
         $array['title'] = $row[0];
@@ -67,26 +61,6 @@ class Image_library {
         $array['description'] = (isset($row[2]) && $row[2] != "") ? $row[2] : "";
 
         return $array;
-    }
-
-    /**
-     * As per requirement "If a consecutive load of the data contains already existing elements, the data will be overwritten with the newest version"
-     * check if the title is duplicated in images to be uploaded.
-     * 
-     * @param type $images
-     * @param type $row
-     * @return boolean
-     */
-    public function checkDuplicateTitle($images, $row) {
-        if (empty($images))
-            return TRUE;
-
-        foreach ($images as $image) {
-            if ($image['title'] == $row[0]) {
-                return FALSE;
-            }
-        }
-        return TRUE;
     }
 
     /**

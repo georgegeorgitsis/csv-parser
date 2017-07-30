@@ -42,8 +42,11 @@ class Image extends REST_Controller {
             }
 
             $filtered_row = $this->image_library->sanitizeData($row); //Sanitize the data before any action.
-            if ($this->image_library->validateRow($filtered_row[0], $filtered_row[1])) { //Check if row is valid per title and url.
-                $row_data = $this->image_library->prepareRow($this->images_to_upload, $filtered_row);
+            if (!$this->image_library->validateRow($filtered_row[0], $filtered_row[1])) //Check if row is valid per title and url.
+                continue;
+
+            if (!$this->isDuplicatedTitle($row)) { //Check if title is duplicated
+                $row_data = $this->image_library->prepareRow($this->images_to_upload, $filtered_row); //Create array based on database to use Active Record.
                 $row_data['request_uuid'] = $request_id; //add in which request_id the images belongs.
                 array_push($this->images_to_upload, $row_data); //push the image in this row in images_to_upload, for batch insert
             }
@@ -149,10 +152,32 @@ class Image extends REST_Controller {
         $request_data['UUID'] = $this->image_library->get_uuid(); //create uuid for the request
         $request_data['request'] = 'upload_images'; //Hardcoded data. Check TODO.
         $request_data['method'] = 'POST'; //Hardcoded data. Check TODO.
-        $request_data['status'] = 0; //Status is in_progress.
+        $request_data['status'] = 0; //Status is in_progress. Can be defined in constants.
 
         if ($this->Request_model->insertRequest($request_data)) //Insert the request in db
             return $request_data['UUID'];
+        return FALSE;
+    }
+
+    /**
+     * As per requirement "If a consecutive load of the data contains already existing elements, the data will be overwritten with the newest version"
+     * check if the title is duplicated in images to be uploaded.
+     * If is duplicated, replace existing data with new.
+     * 
+     * @param type $row
+     * @return boolean
+     */
+    public function isDuplicatedTitle($row) {
+        if (empty($this->images_to_upload))
+            return FALSE;
+
+        foreach ($this->images_to_upload as $image_key => $image) {
+            if ($image['title'] == $row[0]) {
+                $this->images_to_upload[$image_key]['url'] = $row[1];
+                $this->images_to_upload[$image_key]['description'] = $row[2];
+                break;
+            }
+        }
         return FALSE;
     }
 
