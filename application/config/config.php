@@ -25,7 +25,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   |
  */
 $config['base_url'] = 'http://localhost/berlinger/public/';
-$config['download_dir'] = 'C:/wamp64/www/berlinger/public/images/';
+
+/*
+ * Directory to save downloaded images from csv
+ */
+$config['download_images_dir'] = 'C:/wamp64/www/berlinger/public/images/';
+
+/*
+ * Directory to save uploaded csv files
+ */
+$config['download_csv_dir'] = 'C:/wamp64/www/berlinger/csv_files/';
 /*
   |--------------------------------------------------------------------------
   | Index File

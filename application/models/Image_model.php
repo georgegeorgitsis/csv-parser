@@ -18,14 +18,21 @@ class Image_model extends CI_Model {
     }
 
     /**
-     * 
+     * Using CASE to return in_progress, failed or completed download. Should use constants and parse it in Controller.
      * @return result_array or boolean
      */
-    public function getImages() {
-        $this->db->select('images.uuid,images.title,images.remote_url as url,images.description')
+    public function getImages($request_uuid = null) {
+        $this->db->select("images.uuid,images.title,images.remote_url as url,images.description,"
+                        . "CASE status WHEN 0 THEN 'in_progress'
+                     WHEN 1 THEN 'failed'
+                     ELSE 'completed'
+    END as status")
                 ->from('images')
                 ->where('is_deleted', 0)
                 ->order_by('created_date');
+
+        if (!is_null($request_uuid))
+            $this->db->where('request_uuid', $request_uuid);
 
         $qry = $this->db->get();
         if ($qry->num_rows() > 0)
@@ -39,16 +46,13 @@ class Image_model extends CI_Model {
      * @param type $title
      * @return row_array or boolean
      */
-    public function getImage($uuid = null, $title = null) {
+    public function getImage($uuid) {
         $this->db->select('images.uuid,images.title,images.description,images.local_name,images.type')
                 ->from('images')
                 ->where('is_deleted', 0);
 
         if (!is_null($uuid)) //if uuid passed add it to where
             $this->db->where('uuid', $uuid);
-
-        if (!is_null($title)) //if title passed add it to where
-            $this->db->where('title', $title);
 
         $qry = $this->db->get();
 
@@ -57,10 +61,35 @@ class Image_model extends CI_Model {
         return FALSE;
     }
 
+    /**
+     * Batch insert images in `images` table using transaction.
+     * 
+     * @param type $images
+     */
     public function batchInsertImages($images) {
         $this->db->trans_start();
         $this->db->insert_batch('images', $images);
-        $this->db->trans_commit();
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        } else {
+            $this->db->trans_commit();
+            return TRUE;
+        }
+    }
+
+    /**
+     * Update image data based on UUID of image
+     * 
+     * @param type $image_uuid
+     * @param type $image_data
+     * @return boolean
+     */
+    public function updateImageData($image_uuid, $image_data) {
+        $this->db->where('uuid', $image_uuid)->update('images', $image_data);
+        if ($this->db->affected_rows() == 1)
+            return TRUE;
+        return FALSE;
     }
 
 }

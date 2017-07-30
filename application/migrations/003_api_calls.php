@@ -7,13 +7,14 @@
  */
 
 /**
- * Description of Migration_init_image
+ * Description of 003_api_calls
  *
- * @author GeorgeGeorgitsis
+ * @author @GeorgeGeorgitsis
  */
-class Migration_init_image extends CI_Migration {
+class Migration_api_calls extends CI_Migration {
 
     public function up() {
+        //Create table Requests to save the API calls
         $this->dbforge->add_field(array(
             'id' => array(
                 'type' => 'BIGINT',
@@ -24,37 +25,20 @@ class Migration_init_image extends CI_Migration {
                 'type' => 'VARCHAR',
                 'constraint' => '50',
             ),
-            'title' => array(
+            'request' => array(
                 'type' => 'VARCHAR',
                 'constraint' => '255',
             ),
-            'name' => array(
+            'method' => array(
+                'type' => 'VARCHAR',
+                'constraint' => '15',
+            ),
+            'csv_file' => array(
                 'type' => 'VARCHAR',
                 'constraint' => '255',
-            ),
-            'local_name' => array(
-                'type' => 'VARCHAR',
-                'constraint' => '255',
-            ),
-            'remote_url' => array(
-                'type' => 'TEXT',
-            ),
-            'type' => array(
-                'type' => 'VARCHAR',
-                'constraint' => '8',
-                'default' => NULL
-            ),
-            'description' => array(
-                'type' => 'TEXT',
-                'default' => NULL
             ),
             'status' => array(
-                'type' => 'SMALLINT',
-                'default' => 0
-            ),
-            'is_deleted' => array(
-                'type' => 'SMALLINT',
-                'constraint' => '1',
+                'type' => 'MEDIUMINT',
                 'default' => 0
             ),
             'updated_date' => array(
@@ -66,7 +50,14 @@ class Migration_init_image extends CI_Migration {
 
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->add_key('UUID', TRUE);
-        $this->dbforge->create_table('images');
+        $this->dbforge->create_table('requests');
+
+
+        //Alter Table Images to handle which request_id is each image
+        $fields = array(
+            'request_uuid' => array('type' => 'VARCHAR', 'constraint' => '50',)
+        );
+        $this->dbforge->add_column('images', $fields);
     }
 
 }
