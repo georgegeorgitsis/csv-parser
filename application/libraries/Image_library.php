@@ -154,9 +154,8 @@ class Image_library {
     /**
      * Download the image from URL and upload it to server.
      * 
-     * We use the copy() function of PHP to download image.
+     * Use curl to download image instead of copy or get_contents for security reasons
      * 
-     * TODO: use CURL to download image for security reasons and validations.
      * 
      * @param type $url
      * @param type $name
@@ -169,8 +168,20 @@ class Image_library {
         if ($download_dir != "" && $download_dir && is_dir($download_dir)) { //If the PATH is set
             $local_name = $this->get_uuid() . $name; //Create unique local name of image. An image with the same name can be in many URLs.
             $fullpath = $download_dir . '/' . $local_name;
-            copy($url, $fullpath); //Copy image to PATH. Check TODO.
-            return $local_name;
+
+            //Download image to server
+            $ch = curl_init($url);
+            $fp = fopen($fullpath, 'wb');
+            curl_setopt($ch, CURLOPT_FILE, $fp);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_exec($ch);
+            curl_close($ch);
+            fclose($fp);
+
+            if (file_exists($fullpath))
+                return $local_name;
+            return FALSE;
         }
         return FALSE;
     }

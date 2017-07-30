@@ -17,6 +17,12 @@ class Request_model extends CI_Model {
         parent::__construct();
     }
 
+    /**
+     * Insert single request in db
+     * 
+     * @param type $request
+     * @return boolean
+     */
     public function insertRequest($request) {
         $this->db->insert('requests', $request);
         if ($this->db->affected_rows() == 1)
@@ -24,6 +30,12 @@ class Request_model extends CI_Model {
         return FALSE;
     }
 
+    /**
+     * Get all requests per status.
+     * 
+     * @param type $status
+     * @return boolean
+     */
     public function getRequests($status) {
         $qry = $this->db->select('*')
                 ->from('requests')
@@ -34,6 +46,13 @@ class Request_model extends CI_Model {
         return FALSE;
     }
 
+    /**
+     * Update request data per request UUID
+     * 
+     * @param type $request_uuid
+     * @param type $request_data
+     * @return boolean
+     */
     public function updateRequestData($request_uuid, $request_data) {
         $this->db->where('uuid', $request_uuid)->update('requests', $request_data);
         if ($this->db->affected_rows() == 1)
