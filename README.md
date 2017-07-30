@@ -35,7 +35,7 @@ The API allows 3 different operations:
 8. Inserts all `in_progress` images into db.
 9. Returns all saved `in_progress` images from database.
 
-### Quick Explanation of POST
+#### Quick Explanation of POST
 In order to upload big data and large csv files, the application was designed in a way that could handle them. 
 
 Instead of validating the existence and download each image in real-time-process (2 processes that need time to be executed), the application saves in db the records with a picture_title field and a valid URL by syntax. 
@@ -62,7 +62,7 @@ Until the download_images functionality is completed, the uploaded images can st
 2. The application retrieves all images from db and returns in `JSON` format.
 3. In order to retrieve images in `XML`, a parameter `?format=XML` is required.
 
-### Quick Explanation of GET ALL images
+#### Quick Explanation of GET ALL images
 For assignment purposes, there is no validation of the user. The `getImages` request returns all the available images from db.
 
 ---
@@ -73,7 +73,7 @@ For assignment purposes, there is no validation of the user. The `getImages` req
 3. There is a requirement that a local copy of the image is always available.
 4. In order to retrieve the image in `XML`, a parameter `?format=XML` is also required.
 
-### Quick Explanation of GET one image
+#### Quick Explanation of GET one image
 After POSTing the csv file, or after performing the GET ALL images request, a uuid is returned for each image. The user must use the parameter `?uuid=THE_UUID_VALUE` to retrieve the selected image.
 
 ---
@@ -85,7 +85,7 @@ After POSTing the csv file, or after performing the GET ALL images request, a uu
 5. Run migration file to create the database schema. The migration URL is `YOUR_DOMAIN/migrate`
 
 ---
-#### Validation of images
+### Validation of images
 
 As you have read in the `Quick Explanation of POST`, the validation is split into 2 operations. 
 The first validations of rows are performed when reading the csv file and are:
