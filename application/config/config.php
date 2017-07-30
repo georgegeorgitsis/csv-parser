@@ -24,17 +24,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   | a PHP script and you can easily do that on your own.
   |
  */
-$config['base_url'] = 'http://localhost/berlinger/public/';
+$config['base_url'] = '';
 
 /*
  * Directory to save downloaded images from csv
  */
-$config['download_images_dir'] = 'C:/wamp64/www/berlinger/public/images/';
+$config['download_images_dir'] = '';
 
 /*
  * Directory to save uploaded csv files
  */
-$config['download_csv_dir'] = 'C:/wamp64/www/berlinger/csv_files/';
+$config['download_csv_dir'] = '';
 /*
   |--------------------------------------------------------------------------
   | Index File

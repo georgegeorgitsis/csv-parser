@@ -24,7 +24,7 @@ class Test extends CI_Controller {
      */
     public function postCSV() {
         $csv_path = $this->config->item('download_csv_dir');
-        $csv_file = '@' . $csv_path . 'images_data.csv';
+        $csv_file = $csv_path . 'images_data.csv';
         $post = array('images' => $csv_file);
 
         $url = base_url('api/image/insert');

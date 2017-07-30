@@ -32,6 +32,7 @@ class Image extends REST_Controller {
             $this->set_response(array(), REST_Controller::HTTP_INTERNAL_SERVER_ERROR); //Unable to save in db, HTTP CODE 500
             die(); //Instead of die, log to file with the error
         }
+       
         $csv = fopen($csv_result, 'r'); //open the local csv file
 
         $first_row = true; //It is a requirement that the first row of the csv must be ignored. We can first delete the first row and then save the csv or skip the first row, like here.
@@ -51,7 +52,7 @@ class Image extends REST_Controller {
                 array_push($this->images_to_upload, $row_data); //push the image in this row in images_to_upload, for batch insert
             }
         }
-
+        
         if ($this->Image_model->batchInsertImages($this->images_to_upload)) { //batch insert images. If success, return images. Otherwise HTTP CODE 500.
             $images = $this->Image_model->getImages($request_id); //Return the saved images
             $this->set_response($images, REST_Controller::HTTP_CREATED); // CREATED (201) being the HTTP response code
@@ -175,6 +176,7 @@ class Image extends REST_Controller {
             if ($image['title'] == $row[0]) { //If title is duplicated, replace data with new
                 $this->images_to_upload[$image_key]['url'] = $row[1];
                 $this->images_to_upload[$image_key]['description'] = $row[2];
+                break;
                 return TRUE;
             }
         }

@@ -68,18 +68,16 @@ class Image_model extends CI_Model {
     /**
      * Batch insert images in `images` table using transaction.
      * 
+     * TODO: Rollback is failure
+     * 
      * @param type $images
      */
     public function batchInsertImages($images) {
         $this->db->trans_start();
         $this->db->insert_batch('images', $images);
-        if ($this->db->trans_status() === FALSE) {
-            $this->db->trans_rollback();
-            return FALSE;
-        } else {
-            $this->db->trans_commit();
-            return TRUE;
-        }
+        $this->db->trans_commit();
+        
+        return TRUE;
     }
 
     /**
