@@ -23,13 +23,13 @@ The API allows 3 different operations:
 1. The user POSTs a csv file with key `images` to `DOMAIN/image/insert`.
 2. The application receives and saves the posted csv file locally.
 3. A new request is saved into database with UUID and status `in_progress`
-4. Opens the saved csv file and loops through each row/image.
+4. The application opens the saved csv file and loops through each row/image.
 5. Sanitizes and validates rows (fields + URL syntax).
 6. Checks if there are duplicates in picture title fields and replaces if so.
 7. Each valid row/image from csv file with status `in_progress`, is pushed into array in order to batch insert into db.
 8. Insert all `in_progress` images into db.
 
-### Quick Explanation
+### Quick Explanation of POST
 In order to upload big data and large csv files, the application was designed in a way that could handle them. 
 
 Instead of validating the existence and download each image in real-time-process (2 processes that need time to be executed), the application saves in db the records with a picture_title field and a valid URL by syntax. 
@@ -44,6 +44,24 @@ In that way, the application can handle millions of records and the only limit i
 
 A daemon/worker/queue/cron can be used to run the above `Download_images` functionality. Because i have only a simple shared web hosting account, i could not test any of them. 
 Instead of that, there is a URL that will perform the existence and download of each image in `DOMAIN/download_images`.
+
+Until the download_images functionality is run, the validated images can still be retrieved but with status `in_progress`. 
+
+## The workflow of GET ALL images request
+1. The user can GET all of his images to `DOMAIN/image/getImages`.
+2. The application retrieves all images in db and returns in `JSON` format.
+3. In order to retrieve images in `XML`, a parameter `?format=XML` is required.
+
+### Quick Explanation of GET ALL images
+For assignment purposes, there is no validation of the user. The `getImages` request returns all the available images from db.
+
+## The workflow of GET a single image request
+1. The user can GET one image using the parameter `UUID` in the request.
+2. The application retrieves the image (if available by uuid) and searches the local directory to return the local image.
+3. There is a requirement that a local copy of the image is always available.
+
+### Quick Explanation of GET one image
+After POSTing the csv file, or after performing the GET ALL images request, a uuid is returned for each image. The user must use the parameter `?uuid=THE_UUID_VALUE` to retrieve the selected image.
 
 ### Installation / Configuring
 1. Download or clone repository into your webserver. The domain should point to folder `public` where `index.php` will route into `Codeigniter`
