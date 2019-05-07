@@ -1,4 +1,4 @@
-# Berlinger Interview Assignment
+# CSV parser
 ---
 by:
 George Georgitsis (georgegeorgitsis@gmail.com)
@@ -6,21 +6,17 @@ George Georgitsis (georgegeorgitsis@gmail.com)
 ## Getting Started
 
 ### Introduction
-This small API web service was written for the purposes of the the Interview Assignment that was given to me on 28/07/2017 by Berlinger.
 
-The application was built in PHP using `Codeigniter v.3.1` through `composer` from https://github.com/kenjis/codeigniter-composer-installer , `Restserver` through `composer` from https://github.com/chriskacerguis/codeigniter-restserver and `MySQL`
+The application was built in PHP using `Codeigniter v.3.1` via `composer` from https://github.com/kenjis/codeigniter-composer-installer , `Restserver` via `composer` from https://github.com/chriskacerguis/codeigniter-restserver and `MySQL`
 
 The API supports HTTP requests with methods POST and GET. One POST request to send a csv file with images and two GET requests to retrieve all or a single image based on its UUID.
 
-For assignment purposes, no `API KEY` is required, neither any other Authentication/Authorization service to use or install the application.
+For testing purposes, no `API KEY` is required, neither any other Authentication/Authorization service to use or install the application.
 
 The API allows 3 different operations:
 * Allow the user to POST a csv file containg images
 * Allow the user to get all images
 * Allow the user to get a single image using the unique identifier
-
-
- *The API was tested using LAMP Stack on Ubuntu 16.10 and WAMP64 on Windows 10. Also Postman was used to simulate requests.*
 
 ---
 
@@ -50,8 +46,7 @@ When all images are parsed, the application updates the request to status 2, tha
 
 In that way, the application can handle millions of records and the only limit is if the server can handle big csv files.
 
-A daemon/worker/queue/cron can be used to run the above `Download_images` functionality. Because i have only a simple shared web hosting account, i could not test any of them. 
-Instead of that, there is a URL that will perform the existence and download of each image in `DOMAIN/download_images`. Check NOTES below for more information.
+A daemon/worker/queue/cron can be used to run the above `Download_images` functionality. There is a URL that will perform the existence and download of each image in `DOMAIN/download_images`. Check NOTES below for more information.
 
 Until the download_images functionality is completed, the uploaded images can still be retrieved but with status `in_progress`. 
 
@@ -63,7 +58,7 @@ Until the download_images functionality is completed, the uploaded images can st
 3. In order to retrieve images in `XML`, a parameter `?format=XML` is required.
 
 #### Quick Explanation of GET ALL images
-For assignment purposes, there is no validation of the user. The `getImages` request returns all the available images from db.
+The `getImages` request returns all the available images from db.
 
 ---
 
@@ -134,11 +129,10 @@ The second validations are performed when `download_images` functionality runs a
 
 ---
 #### How to Test 
-* The API is uploaded on my shared hosting account with limited recourses.
-* The API URL to test the POST functionality is http://domain/berlinger/public/api/image/insert . You can POST a csv file with key `images` from anywhere or visit http://domain/berlinger/public/test/postCSV to POST the sample `images_data.csv` of the assigment. 
-* After POSTing the csv file, you have to manually visit http://domain/berlinger/public/download_images/processRequests in order to validate and download the images. Otherwise all uploaded images will be `in_progress`.
-* The API URL to GET ALL images functionality is http://domain/berlinger/public/api/image/getImages 
-* The API URL to GET a single image functionality is http://domain/berlinger/public/api/image/getImage?uuid=XXX , where the uuid parameter is dynamically used for already saved images.
+* The API URL to test the POST functionality is http://domain/public/api/image/insert . You can POST a csv file with key `images` from anywhere or visit http://domain/public/test/postCSV to POST the sample `images_data.csv` of the assigment. 
+* After POSTing the csv file, you have to manually visit http://domain/public/download_images/processRequests in order to validate and download the images. Otherwise all uploaded images will be `in_progress`.
+* The API URL to GET ALL images functionality is http://domain/public/api/image/getImages 
+* The API URL to GET a single image functionality is http://domain/public/api/image/getImage?uuid=XXX , where the uuid parameter is dynamically used for already saved images.
 
 ---
 #### Notes
@@ -153,7 +147,6 @@ The files that are written by me, in order to develop this API are the bellow:
 * application/controllers/Download_images.php
 * application/controllers/Migrate.php
 * application/libraries/Image_library.php
-* application/libraries/Image_library.php
 * application/migrations/001_init_image | application/migrations/002_size | application/migrations/003_api_calls
 
 ---
@@ -161,10 +154,9 @@ The files that are written by me, in order to develop this API are the bellow:
 There are a lot of things that would need refactoring for considering this app a full RESTful API and a well build application. I can see the following:
 
 * Create API KEYS for each user to use the API.
-* Run the `Download_images` process as a worker or as a separated thread at least, immediately after the POST request is completed, based on server load.
+* Run the `Download_images` process as a queue worker.
 * A field `is_deleted` is added in `images` table, in order to let the user delete his images in the future.
 * Validations and downloads of images can be performed faster and safer using raw information of the image.
 * For GET requests of the image(s), there are more fields/information to be returned. Those information can be used for other purposes or can be returned back to the user.
-* A PATCH method request to update the already saved images with new fields/information.
-* Constants in application to control variables that are used in controllers, models and libraries.
+* A PUT request to update the already saved images with new fields/information.
 * A cache system for both images and sql queries.

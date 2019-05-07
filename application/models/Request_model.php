@@ -11,53 +11,67 @@
  *
  * @author @GeorgeGeorgitsis
  */
-class Request_model extends CI_Model {
+class Request_model extends CI_Model
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
     /**
      * Insert single request in db
-     * 
+     *
      * @param type $request
+     *
      * @return boolean
      */
-    public function insertRequest($request) {
+    public function insertRequest($request)
+    {
         $this->db->insert('requests', $request);
-        if ($this->db->affected_rows() == 1)
-            return TRUE;
-        return FALSE;
+        if ($this->db->affected_rows() == 1) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * Get all requests per status.
-     * 
+     *
      * @param type $status
+     *
      * @return boolean
      */
-    public function getRequests($status) {
+    public function getRequests($status)
+    {
         $qry = $this->db->select('*')
-                ->from('requests')
-                ->where('status', $status)
-                ->get();
-        if ($qry->num_rows() > 0)
+            ->from('requests')
+            ->where('status', $status)
+            ->get();
+        if ($qry->num_rows() > 0) {
             return $qry->result_array();
-        return FALSE;
+        }
+
+        return false;
     }
 
     /**
      * Update request data per request UUID
-     * 
+     *
      * @param type $request_uuid
      * @param type $request_data
+     *
      * @return boolean
      */
-    public function updateRequestData($request_uuid, $request_data) {
+    public function updateRequestData($request_uuid, $request_data)
+    {
         $this->db->where('uuid', $request_uuid)->update('requests', $request_data);
-        if ($this->db->affected_rows() == 1)
-            return TRUE;
-        return FALSE;
+        if ($this->db->affected_rows() == 1) {
+            return true;
+        }
+
+        return false;
     }
 
 }

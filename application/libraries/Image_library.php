@@ -11,51 +11,60 @@
  *
  * @author @GeorgeGeorgitsis
  */
-class Image_library {
+class Image_library
+{
 
     /**
      * Sanitize data in row. In this case, we only trim. We can add more filters in a later phase for security reasons and more.
-     * 
+     *
      * @param type $row
+     *
      * @return type
      */
-    public function sanitizeData($row) {
+    public function sanitizeData($row)
+    {
         foreach ($row as $row_key => $row_val) { //loop through data and trim 
             $row[$row_key] = trim($row_val);
         }
+
         return $row;
     }
 
     /**
      * Validate a row. Check if image_title and image_url exists. All other validations we decide to add, should be placed here.
      * Because some images on web, don't have the .format, we let them pass the validation.
-     * 
+     *
      * The CRON will handle if the URL is valid and valid image or not. If it passes the filter_var we accept it.
      * If it is not valid URL or valid image, the CRON will update to status=1 `failed`
-     * 
+     *
      * @param type $title
      * @param type $url
+     *
      * @return boolean
      */
-    public function validateRow($title, $url) {
-        if ($title == "" || $url == "") //check if title and url are empty
-            return FALSE;
+    public function validateRow($title, $url)
+    {
+        if ($title == "" || $url == "") {
+            return false;
+        }
 
-        if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) //check if url's syntax
-            return FALSE;
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return false;
+        }
 
-        return TRUE;
+        return true;
     }
 
     /**
      * Prepare the array for db.
-     * 
+     *
      * @param type $row
+     *
      * @return type
      */
-    public function prepareRow($images, $row) {
-        //prepare the array for db to be inserted. $row[0],[1] etc. can be defined in constants.
-        $array['uuid'] = $this->get_uuid(); //get the UUID
+    public function prepareRow($images, $row)
+    {
+        $array['uuid'] = $this->get_uuid();
         $array['title'] = $row[0];
         $array['remote_url'] = $row[1];
         $array['description'] = (isset($row[2]) && $row[2] != "") ? $row[2] : "";
@@ -65,11 +74,13 @@ class Image_library {
 
     /**
      * Returns information of the file.
-     * 
+     *
      * @param type $filePath
+     *
      * @return type
      */
-    public function filePath($filePath) {
+    public function filePath($filePath)
+    {
         $fileParts = pathinfo($filePath);
 
         if (!isset($fileParts['filename'])) {
@@ -81,21 +92,24 @@ class Image_library {
 
     /**
      * Create a new UUID for each image. Remove the dot created by default when you pass prefix in uniqid.
-     * @return type 
+     * @return type
      */
-    public function get_uuid() {
-        return str_replace('.', '', uniqid(rand(), TRUE));
+    public function get_uuid()
+    {
+        return str_replace('.', '', uniqid(rand(), true));
     }
 
     /**
      * Check if the remote file exists and is an image.
-     * 
+     *
      * Download image and return headers and information.
-     * 
+     *
      * @param type $url
+     *
      * @return array|boolean
      */
-    public function checkRemoteFile($url) {
+    public function checkRemoteFile($url)
+    {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -120,31 +134,36 @@ class Image_library {
         $filePath = $this->filePath($url);
         if ($type[0] == "image") {
             if ($local_name = $this->copyImage($url, $filePath['basename'], $filePath['extension'])) //Check if image is downloaded
-                return array('type' => $filePath['extension'], 'size' => $contentLength, 'name' => $filePath['basename'], 'local_name' => $local_name); //return info of image
-            return FALSE;
+            {
+                return array('type' => $filePath['extension'], 'size' => $contentLength, 'name' => $filePath['basename'], 'local_name' => $local_name);
+            }
+
+            return false;
         }
-        return FALSE;
+
+        return false;
     }
 
     /**
      * Download the image from URL and upload it to server.
-     * 
+     *
      * Use curl to download image instead of copy or get_contents for security reasons
-     * 
-     * 
+     *
+     *
      * @param type $url
      * @param type $name
      * @param type $type
+     *
      * @return boolean|string
      */
-    public function copyImage($url, $name, $type) {
-        $this->ci = & get_instance();
-        $download_dir = $this->ci->config->item('download_images_dir'); //Get path to download images from application/config/config.php
-        if ($download_dir != "" && $download_dir && is_dir($download_dir)) { //If the PATH is set
-            $local_name = $this->get_uuid() . $name; //Create unique local name of image. An image with the same name can be in many URLs.
+    public function copyImage($url, $name, $type)
+    {
+        $this->ci = &get_instance();
+        $download_dir = $this->ci->config->item('download_images_dir');
+        if ($download_dir != "" && $download_dir && is_dir($download_dir)) {
+            $local_name = $this->get_uuid() . $name;
             $fullpath = $download_dir . '/' . $local_name;
 
-            //Download image to server
             $ch = curl_init($url);
             $fp = fopen($fullpath, 'wb');
             curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -154,11 +173,14 @@ class Image_library {
             curl_close($ch);
             fclose($fp);
 
-            if (file_exists($fullpath))
+            if (file_exists($fullpath)) {
                 return $local_name;
-            return FALSE;
+            }
+
+            return false;
         }
-        return FALSE;
+
+        return false;
     }
 
 }

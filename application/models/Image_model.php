@@ -11,9 +11,11 @@
  *
  * @author GeorgeGeorgitsis
  */
-class Image_model extends CI_Model {
+class Image_model extends CI_Model
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -21,77 +23,92 @@ class Image_model extends CI_Model {
      * Using CASE to return in_progress, failed or completed download. Should use constants and parse it in Controller.
      * @return result_array or boolean
      */
-    public function getImages($request_uuid = null) {
+    public function getImages($request_uuid = null)
+    {
         $this->db->select("images.uuid,images.title,images.remote_url as url,images.description,"
-                        . "CASE status WHEN 0 THEN 'in_progress'
+            . "CASE status WHEN 0 THEN 'in_progress'
                      WHEN 1 THEN 'failed'
                      ELSE 'completed'
     END as status")
-                ->from('images')
-                ->where('is_deleted', 0)
-                ->order_by('created_date');
+            ->from('images')
+            ->where('is_deleted', 0)
+            ->order_by('created_date');
 
-        if (!is_null($request_uuid))
+        if (!is_null($request_uuid)) {
             $this->db->where('request_uuid', $request_uuid);
+        }
 
         $qry = $this->db->get();
-        if ($qry->num_rows() > 0)
+        if ($qry->num_rows() > 0) {
             return $qry->result_array();
-        return FALSE;
+        }
+
+        return false;
     }
 
     /**
-     * 
+     *
      * @param type $uuid
      * @param type $title
+     *
      * @return row_array or boolean
      */
-    public function getImage($uuid) {
+    public function getImage($uuid)
+    {
         $this->db->select("images.uuid,images.title,images.remote_url as url,images.description,images.local_name,"
-                        . "CASE status WHEN 0 THEN 'in_progress'
+            . "CASE status WHEN 0 THEN 'in_progress'
                      WHEN 1 THEN 'failed'
                      ELSE 'completed'
     END as status")
-                ->from('images')
-                ->where('is_deleted', 0);
+            ->from('images')
+            ->where('is_deleted', 0);
 
         if (!is_null($uuid)) //if uuid passed add it to where
+        {
             $this->db->where('uuid', $uuid);
+        }
 
         $qry = $this->db->get();
 
-        if ($qry->num_rows() == 1)
+        if ($qry->num_rows() == 1) {
             return $qry->row_array();
-        return FALSE;
+        }
+
+        return false;
     }
 
     /**
      * Batch insert images in `images` table using transaction.
-     * 
-     * TODO: Rollback is failure
-     * 
+     *
+     * @TODO: Rollback is failure
+     *
      * @param type $images
      */
-    public function batchInsertImages($images) {
+    public function batchInsertImages($images)
+    {
         $this->db->trans_start();
         $this->db->insert_batch('images', $images);
         $this->db->trans_commit();
-        
-        return TRUE;
+
+        return true;
     }
 
     /**
      * Update image data based on UUID of image
-     * 
+     *
      * @param type $image_uuid
      * @param type $image_data
+     *
      * @return boolean
      */
-    public function updateImageData($image_uuid, $image_data) {
+    public function updateImageData($image_uuid, $image_data)
+    {
         $this->db->where('uuid', $image_uuid)->update('images', $image_data);
-        if ($this->db->affected_rows() == 1)
-            return TRUE;
-        return FALSE;
+        if ($this->db->affected_rows() == 1) {
+            return true;
+        }
+
+        return false;
     }
 
 }
